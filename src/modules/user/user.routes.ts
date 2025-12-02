@@ -14,10 +14,10 @@ router.post("/", userControllers.createUser)
 
 
 // users get
-  router.get("/", logger, auth(), userControllers.getUser);
+  router.get("/", logger, auth("admin"), userControllers.getUser);
 
 //   single user get
-router.get("/:id", userControllers.getSingleUser)
+router.get("/:id", auth("admin","user"), userControllers.getSingleUser)
 
 // update user
 router.put("/:id", userControllers.updateUser);

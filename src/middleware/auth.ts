@@ -4,7 +4,9 @@ import { NextFunction, Request, Response } from "express"
 import jwt, { JwtPayload }  from "jsonwebtoken";
 import config from "../config";
 
-const auth =()=>{
+
+// roles = ["admin", "user",...]
+const auth =(...roles:string[])=>{
     return async (req: Request, res: Response, next: NextFunction)=>{
         try{
         const token = req.headers.authorization;
@@ -14,10 +16,17 @@ const auth =()=>{
             return res.status(500).json({message: "you are not allowed!!"})
         }
 
-        const decoded = jwt.verify(token, config.JWT_SECRET as string);
-        // console.log({decoded});
+        const decoded = jwt.verify(token, config.JWT_SECRET as string) as JwtPayload;
+        console.log({decoded});
 
         req.user = decoded as JwtPayload;
+
+        if(roles.length && !roles.includes(decoded.role as string)){
+            return res.status(500).json({
+                success: false,
+                message: "you are not permited to visit here!",
+            })
+        }
 
         next();
 
